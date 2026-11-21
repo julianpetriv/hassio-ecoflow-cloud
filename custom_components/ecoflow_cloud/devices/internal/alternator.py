@@ -70,7 +70,14 @@ class Command(enum.Enum):
 class AlternatorCommandMessage(PrivateAPIMessageProtocol):
     """Protobuf command wrapper for the EcoFlow Alternator 800W."""
 
-    def __init__(self, device_sn: str, command: Command, payload: ProtoMessageRaw | None):
+    def __init__(
+        self,
+        device_sn: str,
+        command: Command,
+        payload: ProtoMessageRaw | None,
+        dest: int = AddressId.DEVICE,
+        version: int = 19,
+    ):
         self._packet = alternator_pb2.AlternatorMessage()
         self._payload = payload
         header = self._packet.msg.add()
@@ -85,12 +92,12 @@ class AlternatorCommandMessage(PrivateAPIMessageProtocol):
             header.data_len = 0
         else:
             header.src = AddressId.APP
-            header.dest = AddressId.DEVICE  # device address (20), confirmed by ioBroker reference
+            header.dest = dest
             header.d_src = 1
             header.d_dest = 1
             header.check_type = 3
             header.need_ack = 1
-            header.version = 19
+            header.version = version
             header.payload_ver = 1
             if payload is not None:
                 pdata = payload.SerializeToString()
@@ -166,6 +173,20 @@ class _CurrentLimitEntity(BaseNumberEntity):
 class Alternator(BaseInternalDevice):
     """EcoFlow Alternator 800W smart alternator charger."""
 
+    # Where config writes go. Address 20 is confirmed by the ioBroker reference;
+    # the 600W / 1000W model listens on 96 with version 3 (see AlternatorV2).
+    _DEVICE_ADDRESS: int = AddressId.DEVICE
+    _PROTOCOL_VERSION: int = 19
+
+    def _config_write(self, payload: ProtoMessageRaw) -> AlternatorCommandMessage:
+        return AlternatorCommandMessage(
+            device_sn=self.device_info.sn,
+            command=Command.CONFIG_WRITE,
+            payload=payload,
+            dest=self._DEVICE_ADDRESS,
+            version=self._PROTOCOL_VERSION,
+        )
+
     @override
     def sensors(self, client: EcoflowApiClient) -> Sequence[SensorEntity]:
         return [
@@ -207,10 +228,8 @@ class Alternator(BaseInternalDevice):
                 const.ALTERNATOR_CHARGE_CURRENT_LIMIT,
                 1,
                 70,
-                lambda value: AlternatorCommandMessage(
-                    device_sn=self.device_info.sn,
-                    command=Command.CONFIG_WRITE,
-                    payload=alternator_pb2.AlternatorSet(cfg_sp_charger_dev_batt_chg_amp_limit=float(value)),
+                lambda value: self._config_write(
+                    alternator_pb2.AlternatorSet(cfg_sp_charger_dev_batt_chg_amp_limit=float(value))
                 ),
             ),
             # car_batt_chg = charging the car battery = Reverse Charge mode (station→car)
@@ -221,25 +240,11 @@ class Alternator(BaseInternalDevice):
                 const.ALTERNATOR_REVERSE_CHARGE_CURRENT_LIMIT,
                 1,
                 70,
-                lambda value: AlternatorCommandMessage(
-                    device_sn=self.device_info.sn,
-                    command=Command.CONFIG_WRITE,
-                    payload=alternator_pb2.AlternatorSet(cfg_sp_charger_car_batt_chg_amp_limit=float(value)),
+                lambda value: self._config_write(
+                    alternator_pb2.AlternatorSet(cfg_sp_charger_car_batt_chg_amp_limit=float(value))
                 ),
             ),
-            _StartVoltageEntity(
-                client,
-                self,
-                f"{_HB_KEY}.startVoltage",
-                const.ALTERNATOR_START_VOLTAGE,
-                11,
-                30,
-                lambda raw_value: AlternatorCommandMessage(
-                    device_sn=self.device_info.sn,
-                    command=Command.CONFIG_WRITE,
-                    payload=alternator_pb2.AlternatorSet(start_voltage=raw_value),
-                ),
-            ),
+            *self._voltage_numbers(client),
             ValueUpdateEntity(
                 client,
                 self,
@@ -247,12 +252,21 @@ class Alternator(BaseInternalDevice):
                 const.ALTERNATOR_CABLE_LENGTH,
                 0,
                 10,
-                lambda value: AlternatorCommandMessage(
-                    device_sn=self.device_info.sn,
-                    command=Command.CONFIG_WRITE,
-                    payload=alternator_pb2.AlternatorSet(cable_length=float(value)),
-                ),
+                lambda value: self._config_write(alternator_pb2.AlternatorSet(cable_length=float(value))),
                 enabled=False,
+            ),
+        ]
+
+    def _voltage_numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
+        return [
+            _StartVoltageEntity(
+                client,
+                self,
+                f"{_HB_KEY}.startVoltage",
+                const.ALTERNATOR_START_VOLTAGE,
+                11,
+                30,
+                lambda raw_value: self._config_write(alternator_pb2.AlternatorSet(start_voltage=raw_value)),
             ),
         ]
 
@@ -264,11 +278,7 @@ class Alternator(BaseInternalDevice):
                 self,
                 f"{_HB_KEY}.startStop",
                 const.ALTERNATOR_ENABLED,
-                lambda value: AlternatorCommandMessage(
-                    device_sn=self.device_info.sn,
-                    command=Command.CONFIG_WRITE,
-                    payload=alternator_pb2.AlternatorSet(start_stop=value),
-                ),
+                lambda value: self._config_write(alternator_pb2.AlternatorSet(start_stop=value)),
                 enabled=True,
                 enableValue=1,
             ),
@@ -283,11 +293,7 @@ class Alternator(BaseInternalDevice):
                 f"{_HB_KEY}.operationMode",
                 const.ALTERNATOR_OPERATION_MODE,
                 const.ALTERNATOR_OPERATION_MODE_OPTIONS,
-                lambda value: AlternatorCommandMessage(
-                    device_sn=self.device_info.sn,
-                    command=Command.CONFIG_WRITE,
-                    payload=alternator_pb2.AlternatorSet(operation_mode=value),
-                ),
+                lambda value: self._config_write(alternator_pb2.AlternatorSet(operation_mode=value)),
             ),
         ]
 

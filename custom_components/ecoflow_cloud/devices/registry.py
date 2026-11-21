@@ -5,6 +5,7 @@ from custom_components.ecoflow_cloud.devices import BaseDevice, DiagnosticDevice
 
 from custom_components.ecoflow_cloud.devices.internal import (
     alternator as internal_alternator,
+    alternator_v2 as internal_alternator_v2,
     delta2 as internal_delta2,
     delta2_max as internal_delta2_max,
     delta3 as internal_delta3,
@@ -63,6 +64,8 @@ from custom_components.ecoflow_cloud.devices.public import (
 devices: OrderedDict[str, Type[BaseDevice]] = OrderedDict[str, Type[BaseDevice]](
     {
         "ALTERNATOR": internal_alternator.Alternator,
+        # Alternator Charger 600W / 1000W: address 96, protocol version 3, float start/stop voltages.
+        "ALTERNATOR_V2": internal_alternator_v2.AlternatorV2,
         "DELTA_2": internal_delta2.Delta2,
         "DELTA_3": internal_delta3.Delta3,
         "DELTA_3_PLUS": internal_delta3_plus.Delta3Plus,

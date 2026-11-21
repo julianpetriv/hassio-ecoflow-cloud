@@ -65,7 +65,7 @@ class AlternatorMessage(_message.Message):
     def __init__(self, msg: _Optional[_Iterable[_Union[AlternatorHeader, _Mapping]]] = ...) -> None: ...
 
 class AlternatorHeartbeat(_message.Message):
-    __slots__ = ("status1", "temp", "alternator_power", "switch_off130", "start_voltage", "car_bat_volt", "bat_soc", "charge_to_full268", "unknown269", "station_power", "unknown427", "unknown428", "operation_mode", "start_stop", "permanent_watts", "wifi_rssi", "rated_power", "cable_length608", "unknown609", "sp_charger_car_batt_chg_amp_limit", "sp_charger_dev_batt_chg_amp_limit", "sp_charger_car_batt_chg_amp_max", "sp_charger_dev_batt_chg_amp_max")
+    __slots__ = ("status1", "temp", "alternator_power", "switch_off130", "start_voltage", "car_bat_volt", "bat_soc", "charge_to_full268", "unknown269", "station_power", "unknown427", "unknown428", "car_batt_stop_voltage", "car_batt_start_voltage", "operation_mode", "start_stop", "permanent_watts", "wifi_rssi", "rated_power", "cable_length608", "unknown609", "sp_charger_car_batt_chg_amp_limit", "sp_charger_dev_batt_chg_amp_limit", "sp_charger_car_batt_chg_amp_max", "sp_charger_dev_batt_chg_amp_max")
     STATUS1_FIELD_NUMBER: _ClassVar[int]
     TEMP_FIELD_NUMBER: _ClassVar[int]
     ALTERNATOR_POWER_FIELD_NUMBER: _ClassVar[int]
@@ -78,6 +78,8 @@ class AlternatorHeartbeat(_message.Message):
     STATION_POWER_FIELD_NUMBER: _ClassVar[int]
     UNKNOWN427_FIELD_NUMBER: _ClassVar[int]
     UNKNOWN428_FIELD_NUMBER: _ClassVar[int]
+    CAR_BATT_STOP_VOLTAGE_FIELD_NUMBER: _ClassVar[int]
+    CAR_BATT_START_VOLTAGE_FIELD_NUMBER: _ClassVar[int]
     OPERATION_MODE_FIELD_NUMBER: _ClassVar[int]
     START_STOP_FIELD_NUMBER: _ClassVar[int]
     PERMANENT_WATTS_FIELD_NUMBER: _ClassVar[int]
@@ -101,6 +103,8 @@ class AlternatorHeartbeat(_message.Message):
     station_power: float
     unknown427: int
     unknown428: int
+    car_batt_stop_voltage: float
+    car_batt_start_voltage: float
     operation_mode: int
     start_stop: int
     permanent_watts: float
@@ -112,11 +116,13 @@ class AlternatorHeartbeat(_message.Message):
     sp_charger_dev_batt_chg_amp_limit: float
     sp_charger_car_batt_chg_amp_max: float
     sp_charger_dev_batt_chg_amp_max: float
-    def __init__(self, status1: _Optional[int] = ..., temp: _Optional[int] = ..., alternator_power: _Optional[float] = ..., switch_off130: _Optional[int] = ..., start_voltage: _Optional[int] = ..., car_bat_volt: _Optional[float] = ..., bat_soc: _Optional[float] = ..., charge_to_full268: _Optional[int] = ..., unknown269: _Optional[int] = ..., station_power: _Optional[float] = ..., unknown427: _Optional[int] = ..., unknown428: _Optional[int] = ..., operation_mode: _Optional[int] = ..., start_stop: _Optional[int] = ..., permanent_watts: _Optional[float] = ..., wifi_rssi: _Optional[float] = ..., rated_power: _Optional[float] = ..., cable_length608: _Optional[float] = ..., unknown609: _Optional[float] = ..., sp_charger_car_batt_chg_amp_limit: _Optional[float] = ..., sp_charger_dev_batt_chg_amp_limit: _Optional[float] = ..., sp_charger_car_batt_chg_amp_max: _Optional[float] = ..., sp_charger_dev_batt_chg_amp_max: _Optional[float] = ...) -> None: ...
+    def __init__(self, status1: _Optional[int] = ..., temp: _Optional[int] = ..., alternator_power: _Optional[float] = ..., switch_off130: _Optional[int] = ..., start_voltage: _Optional[int] = ..., car_bat_volt: _Optional[float] = ..., bat_soc: _Optional[float] = ..., charge_to_full268: _Optional[int] = ..., unknown269: _Optional[int] = ..., station_power: _Optional[float] = ..., unknown427: _Optional[int] = ..., unknown428: _Optional[int] = ..., car_batt_stop_voltage: _Optional[float] = ..., car_batt_start_voltage: _Optional[float] = ..., operation_mode: _Optional[int] = ..., start_stop: _Optional[int] = ..., permanent_watts: _Optional[float] = ..., wifi_rssi: _Optional[float] = ..., rated_power: _Optional[float] = ..., cable_length608: _Optional[float] = ..., unknown609: _Optional[float] = ..., sp_charger_car_batt_chg_amp_limit: _Optional[float] = ..., sp_charger_dev_batt_chg_amp_limit: _Optional[float] = ..., sp_charger_car_batt_chg_amp_max: _Optional[float] = ..., sp_charger_dev_batt_chg_amp_max: _Optional[float] = ...) -> None: ...
 
 class AlternatorSet(_message.Message):
-    __slots__ = ("switch_off", "operation_mode", "start_stop", "permanent_watts", "start_voltage", "cable_length", "cfg_sp_charger_car_batt_chg_amp_limit", "cfg_sp_charger_dev_batt_chg_amp_limit")
+    __slots__ = ("switch_off", "car_batt_stop_voltage", "car_batt_start_voltage", "operation_mode", "start_stop", "permanent_watts", "start_voltage", "cable_length", "cfg_sp_charger_car_batt_chg_amp_limit", "cfg_sp_charger_dev_batt_chg_amp_limit")
     SWITCH_OFF_FIELD_NUMBER: _ClassVar[int]
+    CAR_BATT_STOP_VOLTAGE_FIELD_NUMBER: _ClassVar[int]
+    CAR_BATT_START_VOLTAGE_FIELD_NUMBER: _ClassVar[int]
     OPERATION_MODE_FIELD_NUMBER: _ClassVar[int]
     START_STOP_FIELD_NUMBER: _ClassVar[int]
     PERMANENT_WATTS_FIELD_NUMBER: _ClassVar[int]
@@ -125,6 +131,8 @@ class AlternatorSet(_message.Message):
     CFG_SP_CHARGER_CAR_BATT_CHG_AMP_LIMIT_FIELD_NUMBER: _ClassVar[int]
     CFG_SP_CHARGER_DEV_BATT_CHG_AMP_LIMIT_FIELD_NUMBER: _ClassVar[int]
     switch_off: int
+    car_batt_stop_voltage: float
+    car_batt_start_voltage: float
     operation_mode: int
     start_stop: int
     permanent_watts: float
@@ -132,4 +140,4 @@ class AlternatorSet(_message.Message):
     cable_length: float
     cfg_sp_charger_car_batt_chg_amp_limit: float
     cfg_sp_charger_dev_batt_chg_amp_limit: float
-    def __init__(self, switch_off: _Optional[int] = ..., operation_mode: _Optional[int] = ..., start_stop: _Optional[int] = ..., permanent_watts: _Optional[float] = ..., start_voltage: _Optional[int] = ..., cable_length: _Optional[float] = ..., cfg_sp_charger_car_batt_chg_amp_limit: _Optional[float] = ..., cfg_sp_charger_dev_batt_chg_amp_limit: _Optional[float] = ...) -> None: ...
+    def __init__(self, switch_off: _Optional[int] = ..., car_batt_stop_voltage: _Optional[float] = ..., car_batt_start_voltage: _Optional[float] = ..., operation_mode: _Optional[int] = ..., start_stop: _Optional[int] = ..., permanent_watts: _Optional[float] = ..., start_voltage: _Optional[int] = ..., cable_length: _Optional[float] = ..., cfg_sp_charger_car_batt_chg_amp_limit: _Optional[float] = ..., cfg_sp_charger_dev_batt_chg_amp_limit: _Optional[float] = ...) -> None: ...

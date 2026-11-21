@@ -47,6 +47,10 @@ message AlternatorHeartbeat {
     optional float station_power = 425;   // Power delivered to station (W)
     optional int32 unknown427 = 427;       // DCP type info
     optional int32 unknown428 = 428;       // DCP detail info
+    // The 600W / 1000W model (product id 9987) keeps the voltage thresholds as floats here;
+    // start_voltage (138) then only mirrors car_batt_start_voltage truncated to whole volts.
+    optional float car_batt_stop_voltage = 550;  // Car battery stop threshold (V), always below start
+    optional float car_batt_start_voltage = 551; // Car battery start threshold (V)
     optional int32 operation_mode = 581;  // 1=charge, 2=battery maintenance, 3=reverse charge
     optional int32 start_stop = 597;      // Charger enabled: 0=off, 1=on
     optional float permanent_watts = 598; // Configured power limit (W)
@@ -64,6 +68,9 @@ message AlternatorHeartbeat {
 // Note: field numbers differ from AlternatorHeartbeat — these are ConfigWrite fields
 message AlternatorSet {
     optional int32 switch_off = 1;        // Power off/on
+    // 600W / 1000W model (product id 9987): the app always writes both thresholds together, in volts.
+    optional float car_batt_stop_voltage = 22;   // Car battery stop threshold (V)
+    optional float car_batt_start_voltage = 24;  // Car battery start threshold (V)
     optional int32 operation_mode = 116;  // 1=charge, 2=maintenance, 3=reverse charge
     optional int32 start_stop = 122;      // 0=off, 1=on
     optional float permanent_watts = 123; // Power limit (W, 0–800)
